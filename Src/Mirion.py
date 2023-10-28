@@ -1,5 +1,5 @@
 from tkinter import *
-from clientTest_async import *
+import clientTest_async as mbc  # mbc = modbus client
 import asyncio
 import time
 ############################################################
@@ -14,8 +14,9 @@ import time
 #
 # asyncio.run(get_data_from_server())
 
-
-input1 = 500
+# client = mbc.setup_async_client('127.0.0.1', 502)
+# operation = mbc.read_input_register
+input1 = 300
 
 ############################################################
 #
@@ -101,12 +102,8 @@ def create_tics(num,sx,elx,esx,gap):
         linePos_y+=(container_height - len(labels)*gap)/(len(labels)+1)
         label_ypos += (container_height - len(labels)*gap)/(len(labels)+1)
 
-# def read_mbc(mbc_data):
-#     data = mbc_data
-#     return data
-
-async def run_mirion():
-    await window.mainloop()
+def run_mirion():
+    window.mainloop()
 
 # Bind mouse button press and motion events to the window
 window.bind("<ButtonPress-1>", on_mouse_press)
