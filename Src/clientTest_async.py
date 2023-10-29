@@ -37,20 +37,22 @@ async def read_input_register(client):
         return rr.registers[0]
         # return rr.registers[0]
     except ModbusIOException:
-        pass
+        return 1000
 
 
 async def read_from_server(setup_client=setup_async_client(), call=None):
     """Combine setup and run."""
+    # return await run_async_client(setup_client, modbus_calls=call)
     return await run_async_client(setup_client, modbus_calls=call)
-
 
 """Assigning function object to operation and passing entire function
 This will give flexibility when wanting to do a different type of operation
 such as write from client"""
-client = setup_async_client('127.0.0.1', 502)
-operation = read_input_register
+# client = setup_async_client('127.0.0.1', 502)
+# operation = read_input_register
+
 
 if __name__ == "__main__":
-    asyncio.run(read_from_server(client, operation), debug=True)  # pragma: no cover
-
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # asyncio.run(read_from_server(client, operation), debug=True)  # pragma: no cover
+    asyncio.run(read_from_server(), debug=True)  # pragma: no cover

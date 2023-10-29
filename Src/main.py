@@ -4,7 +4,18 @@
 # import clientTest_async as mbc  # mbc = modbus client
 #
 # client = mbc.setup_async_client('127.0.0.1', 502)
-# operation = mbc.read_input_register
+# read_register = mbc.read_input_register
+#
+# value = int()
+# async def main():
+#     read_task = asyncio.create_task(mbc.read_from_server(client, read_register))
+#     value = await read_task
+#     mir.run_mirion()
+#
+#
+# asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+# asyncio.run(main())
+
 #
 #
 # async def main():
