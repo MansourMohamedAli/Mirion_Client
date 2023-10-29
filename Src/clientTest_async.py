@@ -21,29 +21,39 @@ async def run_async_client(client, modbus_calls=None):
     """Run sync client."""
     _logger.info("### Client starting")
     await client.connect()
-    assert client.connected
-    if modbus_calls:
-        return await modbus_calls(client)
-    client.close()
-    _logger.info("### End of Program")
+    if client.connected is True:
+        if modbus_calls:
+            return await modbus_calls(client)
+    else:
+        client.close()
+        _logger.info("### End of Program")
+        return 0
+
+
+    # assert client.connected, 'Client not connected'
+    # if modbus_calls:
+    #     return await modbus_calls(client)
+    # client.close()
+    # _logger.info("### End of Program")
 
 
 async def read_input_register(client):
     """Test connection works."""
     try:
         rr = await client.read_input_registers(0, 1)
-        # assert rr.registers[0] == 150
-        # print(rr.registers[0])
-        return rr.registers[0]
-        # return rr.registers[0]
-    except ModbusIOException:
+    except ModbusIOException as e:
+        _logger.error(e)
         return 1000
+    else:
+        """If try is successful"""
+        return rr.registers[0]
 
 
 async def read_from_server(setup_client=setup_async_client(), call=None):
     """Combine setup and run."""
     # return await run_async_client(setup_client, modbus_calls=call)
     return await run_async_client(setup_client, modbus_calls=call)
+
 
 """Assigning function object to operation and passing entire function
 This will give flexibility when wanting to do a different type of operation

@@ -56,14 +56,14 @@ def on_mouse_motion(event):
 
 
 # Function to switch to Page 1
-def show_page1():
+def show_page1(page2_frame=None):
     page2_frame.pack_forget()
     page1_frame.pack(fill="both"
                      , expand=True)
 
 
 # Function to switch to Page 2
-def show_page2():
+def show_page2(page2_frame=None):
     page1_frame.pack_forget()
     page2_frame.pack(fill="both"
                      , expand=True)
@@ -108,6 +108,13 @@ def create_tics(num, sx, elx, esx, gap):
 async def read_data():
     return await mbc.read_from_server(client, read_register)
 
+async def data_stream(read_data):
+    counter = 0
+    while True:
+        print(read_data)
+        counter += 1
+        print(counter)
+        await asyncio.sleep(1)
 
 def run_mirion():
     window.mainloop()
@@ -150,11 +157,12 @@ bar_Width = container_width / 3
 bar_graph = Canvas(barFrame, width=container_width / 3, height=container_height, bg=window["bg"], highlightthickness=0)
 
 
-x= [asyncio.run(read_data())]
-print(x)
+
+x = [asyncio.run(read_data())]
+asyncio.run(data_stream(x))
+# print(x)
 # update_graph([asyncio.run(read_data())])
 update_graph(x)
-
 
 # Using Unicode characters for superscripts
 superscript = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
