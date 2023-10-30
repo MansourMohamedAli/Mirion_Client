@@ -108,6 +108,7 @@ def create_tics(num, sx, elx, esx, gap):
 async def read_data():
     return await mbc.read_from_server(client, read_register)
 
+
 async def data_stream(read_data):
     counter = 0
     while True:
@@ -115,6 +116,7 @@ async def data_stream(read_data):
         counter += 1
         print(counter)
         await asyncio.sleep(1)
+
 
 def run_mirion():
     window.mainloop()
@@ -156,13 +158,10 @@ bar_Width = container_width / 3
 
 bar_graph = Canvas(barFrame, width=container_width / 3, height=container_height, bg=window["bg"], highlightthickness=0)
 
-
-
-x = [asyncio.run(read_data())]
-asyncio.run(data_stream(x))
+x = asyncio.run(read_data())
 # print(x)
 # update_graph([asyncio.run(read_data())])
-update_graph(x)
+update_graph([x])
 
 # Using Unicode characters for superscripts
 superscript = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
