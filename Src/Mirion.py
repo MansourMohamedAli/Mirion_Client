@@ -109,13 +109,13 @@ async def read_data():
     return await mbc.read_from_server(client, read_register)
 
 
-async def data_stream(read_data):
-    counter = 0
-    while True:
-        print(read_data)
-        counter += 1
-        print(counter)
-        await asyncio.sleep(1)
+# async def data_stream(read_data):
+#     counter = 0
+#     while True:
+#         print(read_data)
+#         counter += 1
+#         print(counter)
+#         await asyncio.sleep(1)
 
 
 def run_mirion():

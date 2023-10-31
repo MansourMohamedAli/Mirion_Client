@@ -14,13 +14,14 @@ default_port = 502
 
 
 def setup_async_client(ip: str = default_ip, port: int = default_port):
-    return AsyncModbusTcpClient(ip, port=port)
+    return AsyncModbusTcpClient(ip, port=port, id=1)
 
 
 async def run_async_client(client, modbus_calls=None):
     """Run sync client."""
     _logger.info("### Client starting")
     await client.connect()
+    # print(client.connected)
     if client.connected is True:
         if modbus_calls:
             return await modbus_calls(client)
@@ -29,7 +30,6 @@ async def run_async_client(client, modbus_calls=None):
         _logger.info("### End of Program")
         return 0
 
-
     # assert client.connected, 'Client not connected'
     # if modbus_calls:
     #     return await modbus_calls(client)
@@ -37,13 +37,45 @@ async def run_async_client(client, modbus_calls=None):
     # _logger.info("### End of Program")
 
 
-async def read_input_register(client):
+async def read_coil(c):
     """Test connection works."""
     try:
-        rr = await client.read_input_registers(0, 1)
+        rr = await c.read_coils(0, 7, slave=1)
+        # print(rr.bits)
+        # assert len(rr.bits) == 8
+    except ModbusIOException:
+        client.close()
+        _logger.info("### End of Program")
+        return 0
+    else:
+        """If try is successful"""
+        return rr.bits
+
+
+async def read_input_register(c):
+    """Test connection works."""
+    try:
+        print("Reading...")
+        rr = await c.read_input_registers(0, 1, slave=1)
+        print("Done Reading")
     except ModbusIOException as e:
         _logger.error(e)
-        return 1000
+        return 0
+    else:
+        """If try is successful"""
+        return rr.registers[0]
+
+
+async def read_holding_register(c):
+    """Test connection works."""
+    try:
+        print("Reading...")
+        rr = await c.read_holding_registers(0, 10, slave=1)
+        print(rr.registers[0:10])
+        print("Done Reading")
+    except ModbusIOException as e:
+        _logger.error(e)
+        return 0
     else:
         """If try is successful"""
         return rr.registers[0]
@@ -58,11 +90,10 @@ async def read_from_server(setup_client=setup_async_client(), call=None):
 """Assigning function object to operation and passing entire function
 This will give flexibility when wanting to do a different type of operation
 such as write from client"""
-# client = setup_async_client('127.0.0.1', 502)
-# operation = read_input_register
-
+client = setup_async_client('127.0.0.1', 502)
+operation = read_holding_register
 
 if __name__ == "__main__":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    # asyncio.run(read_from_server(client, operation), debug=True)  # pragma: no cover
-    asyncio.run(read_from_server(), debug=True)  # pragma: no cover
+    asyncio.run(read_from_server(client, operation), debug=True)  # pragma: no cover
+    # asyncio.run(read_from_server(), debug=True)  # pragma: no cover
