@@ -56,7 +56,8 @@ async def read_input_register(c):
     """Test connection works."""
     try:
         print("Reading...")
-        rr = await c.read_input_registers(0, 1, slave=1)
+        rr = await c.read_input_registers(0, 100, slave=1)
+        print(rr.registers[0:100])
         print("Done Reading")
     except ModbusIOException as e:
         _logger.error(e)
@@ -70,8 +71,8 @@ async def read_holding_register(c):
     """Test connection works."""
     try:
         print("Reading...")
-        rr = await c.read_holding_registers(0, 10, slave=1)
-        print(rr.registers[0:10])
+        rr = await c.read_holding_registers(0, 100, slave=1)
+        print(rr.registers[0:100])
         print("Done Reading")
     except ModbusIOException as e:
         _logger.error(e)
@@ -80,6 +81,17 @@ async def read_holding_register(c):
         """If try is successful"""
         return rr.registers[0]
 
+async def write_regs(c):
+    """Test connection works."""
+    try:
+        print("Starting Write...")
+        await c.write_registers(0, 5, slave=1)
+    except ModbusIOException as e:
+        _logger.error(e)
+        return 0
+    else:
+        """If try is successful"""
+        pass
 
 async def read_from_server(setup_client=setup_async_client(), call=None):
     """Combine setup and run."""
@@ -91,7 +103,7 @@ async def read_from_server(setup_client=setup_async_client(), call=None):
 This will give flexibility when wanting to do a different type of operation
 such as write from client"""
 client = setup_async_client('127.0.0.1', 502)
-operation = read_holding_register
+operation = write_regs
 
 if __name__ == "__main__":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
