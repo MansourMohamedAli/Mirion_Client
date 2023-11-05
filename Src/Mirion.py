@@ -122,7 +122,7 @@ async def update_from_mb():
         value = await read_from_server(client, read_register)
         print('Value obtained')
         gui_queue.put(lambda: updateBarGraph(value))
-        await asyncio.sleep(5)
+        await asyncio.sleep(1)
 
 
 def updateBarGraph(value):
