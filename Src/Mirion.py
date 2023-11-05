@@ -1,17 +1,19 @@
+import queue
 from tkinter import *
-import clientTest_async as mbc  # mbc = modbus client
+from clientTest_async import read_from_server, setup_async_client, read_holding_register
 import asyncio
-import time
-import main
+import concurrent.futures
+from queue import *
+import threading
 
 ############################################################
 #
 #                       Modbus Setup
 #
 ############################################################
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-client = mbc.setup_async_client('127.0.0.1', 502)
-read_register = mbc.read_input_register
+# asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+client = setup_async_client('127.0.0.1', 502)
+read_register = read_holding_register
 
 ############################################################
 #
@@ -29,7 +31,6 @@ window.configure(bg="#A4D347")
 # window.resizable(False, False)
 # Remove Border
 window.overrideredirect(True)
-
 
 # Exit Button
 def exit_application():
@@ -105,27 +106,52 @@ def create_tics(num, sx, elx, esx, gap):
         label_ypos += (container_height - len(labels) * gap) / (len(labels) + 1)
 
 
-async def read_data():
-    return await mbc.read_from_server(client, read_register)
+# def run_mirion():
+#     window.mainloop()
 
 
-# async def data_stream(read_data):
-#     counter = 0
-#     while True:
-#         print(read_data)
-#         counter += 1
-#         print(counter)
-#         await asyncio.sleep(1)
+# async def read_reg():
+#     return asyncio.run(read_from_server(client, read_register))
 
 
-def run_mirion():
-    window.mainloop()
+gui_queue = queue.Queue()
+
+
+async def update_from_mb():
+    while True:
+        value = await read_from_server(client, read_register)
+        print('Value obtained')
+        gui_queue.put(lambda: updateBarGraph(value))
+        await asyncio.sleep(5)
+
+
+def updateBarGraph(value):
+    update_graph([value])
+
+
+def periodicGuiUpdate():
+    while True:
+        try:
+            fn = gui_queue.get_nowait()
+        except queue.Empty:
+            break
+        fn()
+    window.after(100, periodicGuiUpdate)
+
+def start_loop():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.create_task(update_from_mb())
+    loop.run_forever()
+
+
 
 
 # Bind mouse button press and motion events to the window
 window.bind("<ButtonPress-1>", on_mouse_press)
 window.bind("<B1-Motion>", on_mouse_motion)
-############################################################           
+
+############################################################
 #
 #                     PAGE 1
 #
@@ -158,10 +184,10 @@ bar_Width = container_width / 3
 
 bar_graph = Canvas(barFrame, width=container_width / 3, height=container_height, bg=window["bg"], highlightthickness=0)
 
-x = asyncio.run(read_data())
-# print(x)
-# update_graph([asyncio.run(read_data())])
-update_graph([x])
+# with concurrent.futures.ThreadPoolExecutor() as executor:
+#     f1 = executor.submit(read_reg)
+
+
 
 # Using Unicode characters for superscripts
 superscript = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
@@ -261,6 +287,21 @@ alarmStatusLabel.grid(column=0, row=0, sticky="nsew")
 statLabel = Label(statusFrame, text="STATUS\nOK", font=("Lucida Console", 14), bg=window["bg"])
 statLabel.grid(column=1, row=0, sticky="nsew")
 
-# Run main window
+# t1 = threading.Thread(target=read_reg)
+# t1.start()
+# t1.join()
+
 if __name__ == "__main__":
-    run_mirion()
+    threading.Thread(target=start_loop).start()
+    periodicGuiUpdate()
+    window.mainloop()
+#     run_mirion()
+    # t1 = threading.Thread(target=run_mirion)
+    # t2 = threading.Thread(target=test)
+    # # t1.daemon = True
+    #
+    # t2.start()
+    # t1.start()
+    #
+    # t2.join()
+    # t1.join()

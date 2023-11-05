@@ -85,7 +85,7 @@ async def write_regs(c):
     """Test connection works."""
     try:
         print("Starting Write...")
-        await c.write_registers(0, 5, slave=1)
+        await c.write_registers(0, 80, slave=1)
     except ModbusIOException as e:
         _logger.error(e)
         return 0

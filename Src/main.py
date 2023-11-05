@@ -1,31 +1,42 @@
 # import asyncio
+# import time
+# import threading
+# import concurrent.futures
+# from clientTest_async import read_from_server, setup_async_client, write_regs
+# from Mirion import run_mirion
 #
-# import Mirion as mir
-# import clientTest_async as mbc  # mbc = modbus client
+# client = setup_async_client('127.0.0.1', 502)
+# operation = write_regs
 #
-# client = mbc.setup_async_client('127.0.0.1', 502)
-# read_register = mbc.read_input_register
-#
-# value = int()
-# async def main():
-#     read_task = asyncio.create_task(mbc.read_from_server(client, read_register))
-#     value = await read_task
-#     mir.run_mirion()
-#
-#
+# start = time.perf_counter()
 # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-# asyncio.run(main())
-
 #
 #
-# async def main():
-#     # loop = asyncio.get_event_loop()
-#     # loop.create_task(mir.run_mirion())
-#     # loop.create_task(mbc.read_from_server(client, operation))
-#     # loop.run_forever()
+# def start_client():
+#     asyncio.run(read_from_server(client, operation), debug=True)  # pragma: no cover
 #
-#     task1 = asyncio.create_task(mir.run_mirion())
-#     task2 = asyncio.create_task(mbc.read_from_server(client, operation))
-#     await asyncio.gather(task1, task2)
 #
-# asyncio.run(main())
+# def start_mirion():
+#     asyncio.run(run_mirion(), debug=True)  # pragma: no cover
+#
+#
+# # with concurrent.futures.ThreadPoolExecutor() as executor:
+# #     f1 = executor.submit(start_client)
+# #     f2 = executor.submit(start_mirion)
+#
+#
+# """We can't pass in do_someting(seconds) because that will execute the function,
+# # Instead I need to pass in args=[seconds]"""
+#
+# t1 = threading.Thread(target=start_client)
+# t2 = threading.Thread(target=start_mirion)
+#
+# t1.start()
+# t2.start()
+#
+# # t1.join()
+# # t2.join()
+#
+# finish = time.perf_counter()
+#
+# print(f'Time:{finish - start}')
