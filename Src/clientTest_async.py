@@ -10,8 +10,8 @@ _logger.setLevel("DEBUG")
 
 """Setup Defaults"""
 default_ip = '127.0.0.1'
-default_port = 502
 
+default_port = 502
 
 def setup_async_client(ip: str = default_ip, port: int = default_port):
     return AsyncModbusTcpClient(ip, port=port, id=1)
@@ -19,17 +19,22 @@ def setup_async_client(ip: str = default_ip, port: int = default_port):
 
 async def run_async_client(client, modbus_calls=None):
     """Run sync client."""
-    _logger.info("### Client starting")
+    # _logger.info("### Client starting")
     # await client.connect()
     # print(client.connected)
     if client.connected is True:
+        # _logger.info("### Client starting read")
         if modbus_calls:
             return await modbus_calls(client)
     else:
+        _logger.info("### Attempting to connect...")
         await client.connect()
         # client.close()
-        _logger.info("### End of Program")
-        return 0
+        # _logger.info("### End of Program")
+        if client.connected is True:
+            _logger.info("### program successfully connected")
+            return 0
+        return -1
 
 
 async def read_coil(c):
@@ -65,10 +70,10 @@ async def read_input_register(c):
 async def read_holding_register(c):
     """Test connection works."""
     try:
-        print("Reading...")
-        rr = await c.read_holding_registers(0, 100, slave=1)
-        print(rr.registers[0:100])
-        print("Done Reading")
+        # print("Reading...")
+        rr = await c.read_holding_registers(0, 1, slave=1)
+        # print(rr.registers[0:1])
+        # print("Done Reading")
     except ModbusIOException as e:
         _logger.error(e)
         return 0
