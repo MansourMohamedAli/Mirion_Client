@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ModPy.iml" filepath="$PROJECT_DIR$/.idea/ModPy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Mirion_Client.iml" filepath="$PROJECT_DIR$/.idea/Mirion_Client.iml" />
     </modules>
   </component>
 </project>
